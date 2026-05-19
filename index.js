@@ -1,10 +1,15 @@
 const express = require("express");
 const app = express();
+var cors = require("cors");
 const { MongoClient, ServerApiVersion } = require("mongodb");
 require("dotenv").config();
+
 const port = process.env.PORT || 5000;
 
 const uri = process.env.MONGO_BD_URI;
+
+app.use(cors());
+app.use(express.json());
 
 const client = new MongoClient(uri, {
   serverApi: {
@@ -17,6 +22,20 @@ const client = new MongoClient(uri, {
 async function run() {
   try {
     await client.connect();
+
+    // get the database and create collection
+    const database = client.db("ideaVault");
+    const ideaCollections = database.collection("ideas");
+
+    // idea post method
+    app.post("/ideas", async (req, res) => {
+      const ideaData = req.body;
+
+      const result = await ideaCollections.insertOne(ideaData);
+      res.send(result);
+
+      console.log(result, "from server post method");
+    });
 
     await client.db("admin").command({ ping: 1 });
     console.log(
