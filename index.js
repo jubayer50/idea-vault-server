@@ -26,6 +26,7 @@ async function run() {
     // get the database and create collection
     const database = client.db("ideaVault");
     const ideaCollections = database.collection("ideas");
+    const commentsCollection = database.collection("comments");
 
     // ideas get method
     app.get("/ideas", async (req, res) => {
@@ -48,6 +49,14 @@ async function run() {
       res.send(result);
     });
 
+    // get method for Trending idea
+    app.get("/trending-ideas", async (req, res) => {
+      const cursor = ideaCollections.find().limit(6);
+      const result = await cursor.toArray();
+
+      res.send(result);
+    });
+
     // idea post method
     app.post("/ideas", async (req, res) => {
       const ideaData = req.body;
@@ -56,6 +65,16 @@ async function run() {
       res.send(result);
 
       console.log(result, "from server post method");
+    });
+
+    // ------------------------------------------------------------------------
+
+    // post comments method
+    app.post("/comments", async (req, res) => {
+      const commentData = req.body;
+
+      const result = await commentsCollection.insertOne(commentData);
+      res.send(result);
     });
 
     await client.db("admin").command({ ping: 1 });
