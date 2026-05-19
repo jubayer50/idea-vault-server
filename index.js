@@ -69,6 +69,14 @@ async function run() {
 
     // ------------------------------------------------------------------------
 
+    // get comments method
+    app.get("/comments", async (req, res) => {
+      const cursor = commentsCollection.find();
+      const result = await cursor.toArray();
+
+      res.send(result);
+    });
+
     // post comments method
     app.post("/comments", async (req, res) => {
       const commentData = req.body;
