@@ -75,6 +75,26 @@ async function run() {
       res.send(result);
     });
 
+    // for meta data
+    app.get("/idea/:IdeaId", async (req, res) => {
+      const { IdeaId } = req.params;
+
+      const query = {
+        _id: new ObjectId(IdeaId),
+      };
+
+      const result = await ideaCollections.findOne(query, {
+        projection: {
+          name: 1,
+          _id: 0,
+        },
+      });
+
+      // const result = await ideaCollections.findOne(query);
+
+      res.send(result);
+    });
+
     // get method for Trending idea
     app.get("/trending-ideas", async (req, res) => {
       const cursor = ideaCollections.find().limit(6);
@@ -122,7 +142,7 @@ async function run() {
     // ------------------------------------------------------------------------
 
     // get comments method
-    app.get("/comments", async (req, res) => {
+    app.get("/comments", verifyToken, async (req, res) => {
       const cursor = commentsCollection.find();
       const result = await cursor.toArray();
 
