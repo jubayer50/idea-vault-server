@@ -2,6 +2,7 @@ const express = require("express");
 const app = express();
 var cors = require("cors");
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+const { createRemoteJWKSet, jwtVerify } = require("jose-cjs");
 require("dotenv").config();
 
 const port = process.env.PORT || 5000;
@@ -18,6 +19,31 @@ const client = new MongoClient(uri, {
     deprecationErrors: true,
   },
 });
+
+//  get the jwks
+const JWKS = createRemoteJWKSet(
+  new URL(`${process.env.FRONT_END_URL}/api/auth/jwks`),
+);
+
+// token verify
+const verifyToken = async (req, res, next) => {
+  const authHeader = req?.headers.authorization;
+  if (!authHeader) {
+    res.status(401).send({ message: "Unauthorized" });
+  }
+
+  const token = authHeader.split(" ")[1];
+  if (!token) {
+    res.status(401).send({ message: "Unauthorized" });
+  }
+
+  try {
+    const { payload } = await jwtVerify(token, JWKS);
+    next();
+  } catch (error) {
+    return res.status(403).send({ message: "Forbidden" });
+  }
+};
 
 async function run() {
   try {
@@ -37,7 +63,7 @@ async function run() {
     });
 
     // idea get single data method
-    app.get("/ideas/:IdeaId", async (req, res) => {
+    app.get("/ideas/:IdeaId", verifyToken, async (req, res) => {
       const { IdeaId } = req.params;
 
       const query = {
