@@ -67,6 +67,21 @@ async function run() {
       console.log(result, "from server post method");
     });
 
+    // ides patch method
+    app.patch("/ideas/:id", async (req, res) => {
+      const { id } = req.params;
+
+      const filter = { _id: new ObjectId(id) };
+
+      const updateData = req.body;
+
+      const result = await ideaCollections.updateOne(filter, {
+        $set: updateData,
+      });
+
+      res.send(result);
+    });
+
     // idea delete method
     app.delete("/ideas/:id", async (req, res) => {
       const { id } = req.params;
@@ -96,7 +111,7 @@ async function run() {
       res.send(result);
     });
 
-    // update comments method
+    // update / patch comments method
     app.patch("/comments/:id", async (req, res) => {
       const { id } = req.params;
 
