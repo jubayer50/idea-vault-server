@@ -67,6 +67,17 @@ async function run() {
       console.log(result, "from server post method");
     });
 
+    // idea delete method
+    app.delete("/ideas/:id", async (req, res) => {
+      const { id } = req.params;
+
+      const result = await ideaCollections.deleteOne({
+        _id: new ObjectId(id),
+      });
+
+      res.send(result);
+    });
+
     // ------------------------------------------------------------------------
 
     // get comments method
