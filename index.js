@@ -102,6 +102,17 @@ async function run() {
       res.send(result);
     });
 
+    // delete comment method
+    app.delete("/comments/:id", async (req, res) => {
+      const { id } = req.params;
+
+      const result = await commentsCollection.deleteOne({
+        _id: new ObjectId(id),
+      });
+
+      res.send(result);
+    });
+
     await client.db("admin").command({ ping: 1 });
     console.log(
       "Pinged your deployment. You successfully connected to MongoDB!",
