@@ -56,10 +56,12 @@ async function run() {
 
     // ideas get method
     app.get("/ideas", async (req, res) => {
-      const { search } = req.query;
+      const { search, category } = req.query;
 
-      let cursor;
+      // let cursor;
+      let query = {};
 
+      /*
       if (search) {
         cursor = ideaCollections.find({
           name: { $regex: search, $options: "i" },
@@ -68,7 +70,27 @@ async function run() {
         cursor = ideaCollections.find();
       }
 
-      // const cursor = ideaCollections.find();
+     */
+
+      // new search
+      if (search) {
+        query.name = {
+          $regex: search,
+          $options: "i",
+        };
+      }
+
+      // new category
+      if (category) {
+        query.category = category;
+      }
+
+      // const cursor = ideaCollections.find(); old
+
+      // const result = await cursor.toArray();
+
+      const cursor = ideaCollections.find(query);
+
       const result = await cursor.toArray();
 
       res.send(result);
