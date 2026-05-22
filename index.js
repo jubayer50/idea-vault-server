@@ -47,7 +47,7 @@ const verifyToken = async (req, res, next) => {
 
 async function run() {
   try {
-    await client.connect();
+    // await client.connect();
 
     // get the database and create collection
     const database = client.db("ideaVault");
@@ -138,17 +138,15 @@ async function run() {
     });
 
     // idea post method
-    app.post("/ideas", async (req, res) => {
+    app.post("/ideas", verifyToken, async (req, res) => {
       const ideaData = req.body;
 
       const result = await ideaCollections.insertOne(ideaData);
       res.send(result);
-
-      console.log(result, "from server post method");
     });
 
     // ides patch method
-    app.patch("/ideas/:id", async (req, res) => {
+    app.patch("/ideas/:id", verifyToken, async (req, res) => {
       const { id } = req.params;
 
       const filter = { _id: new ObjectId(id) };
@@ -163,7 +161,7 @@ async function run() {
     });
 
     // idea delete method
-    app.delete("/ideas/:id", async (req, res) => {
+    app.delete("/ideas/:id", verifyToken, async (req, res) => {
       const { id } = req.params;
 
       const result = await ideaCollections.deleteOne({
@@ -184,7 +182,7 @@ async function run() {
     });
 
     // post comments method
-    app.post("/comments", async (req, res) => {
+    app.post("/comments", verifyToken, async (req, res) => {
       const commentData = req.body;
 
       const result = await commentsCollection.insertOne(commentData);
@@ -192,7 +190,7 @@ async function run() {
     });
 
     // update / patch comments method
-    app.patch("/comments/:id", async (req, res) => {
+    app.patch("/comments/:id", verifyToken, async (req, res) => {
       const { id } = req.params;
 
       const filter = {
@@ -209,7 +207,7 @@ async function run() {
     });
 
     // delete comment method
-    app.delete("/comments/:id", async (req, res) => {
+    app.delete("/comments/:id", verifyToken, async (req, res) => {
       const { id } = req.params;
 
       const result = await commentsCollection.deleteOne({
@@ -219,10 +217,10 @@ async function run() {
       res.send(result);
     });
 
-    await client.db("admin").command({ ping: 1 });
-    console.log(
-      "Pinged your deployment. You successfully connected to MongoDB!",
-    );
+    // await client.db("admin").command({ ping: 1 });
+    // console.log(
+    //   "Pinged your deployment. You successfully connected to MongoDB!",
+    // );
   } finally {
     // await client.close();
   }
